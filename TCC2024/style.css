@@ -1,0 +1,205 @@
+/*--General--*/
+
+
+
+/* Disable page margin. */
+
+body {    
+    margin: 0;
+}
+
+
+/* Topbar */
+
+.topMenu {
+    background-color: rgb(40, 40, 40);
+    height: 2cm;
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* Text in site default */
+
+.siteText {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+
+/*--Posts--*/
+
+
+
+/* Posts default */
+
+#welcomePost, #utopiaPost {
+    width: 350px;
+    border-style: double;
+    border-color: red;
+}
+
+
+/* Posts when mouse is over */
+
+#welcomePost:hover, #utopiaPost:hover {
+    border-color: white;
+}
+
+
+/* Content in posts boxes */
+
+#inWelcomePost, #inUtopiaPost {
+    position: relative;
+    bottom: 10px;
+    text-align: center;
+}
+
+
+
+/*--Utopia Page--*/
+
+
+
+/* Anything inside the game area */
+
+.gameArea {
+    text-align: center;
+}
+
+
+/* Text in game default */
+
+.gameText {
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+
+/* Anything inside the tv area */
+
+.tvArea {
+    position: relative;
+}
+
+
+/* Scenarios inside tv */
+
+.inTv {
+    text-wrap: wrap;
+    margin: 0 auto;
+    bottom: 16cm;
+    width: 12cm;
+    height: 9cm;
+}
+
+
+/*Button default generalization*/
+
+.btn {
+    border: none;
+    width: 200px;
+    height: 35px;
+    background-color: rgb(84, 85, 255);
+    font-size: 20px;
+}
+
+
+/*Any button when hover*/
+
+.btn:hover {
+    width: 250px;
+}
+
+
+/*Button when active generalization*/
+
+.btn:active {
+    background-color: rgb(170, 170, 170);
+}
+
+
+/*Power button default*/
+
+.btn.power {
+    width: 100px;
+    height: 35px;
+    background-color: rgb(37, 38, 43);
+}
+
+
+/*Power button when mouse is over*/
+
+.btn.power:hover {
+    width: 120px;
+}
+
+
+/*Power button when being clicked*/
+
+.btn.power:active {
+    background-color: black;
+}
+
+
+/*Movement button default*/
+
+.btn.moveBtn {
+    border: none;
+    width: 100px;
+    height: 35px;
+    font-size: 20px;
+}
+
+
+/*Movement button when mouse is over*/
+
+.btn.moveBtn:hover {
+    width: 125px;
+}
+
+
+/*Action button default*/
+
+.btn.actionBtn {
+    border: none;
+    width: 204px;
+    height: 35px;
+    font-size: 20px;
+}
+
+
+/*Action button when mouse is over*/
+
+.btn.actionBtn:hover {
+    width: 229px;
+}
+
+
+/* Button is clickable */
+
+.btn.active {
+    pointer-events: all;
+}
+
+
+/* Button is not clickable */
+
+.btn.deactive {
+    pointer-events: none;
+    background-color: rgb(28, 28, 87);
+    color: gray;
+}
+
+
+/*Tv display*/
+
+#gameTv {
+    width: 25cm;
+    height: 20cm;
+}
+
+#playroom {
+    left: 450px;
+}

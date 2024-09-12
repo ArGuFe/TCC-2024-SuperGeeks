@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>Welcome to the utopia! - LordBlog</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+</head>
+
+<body style="background-color: #000000;">
+
+
+    <!-- Topbar -->
+
+    <div class="topMenu">
+        <!-- Site logo; Linked to the site's main page -->
+
+        <a href="index.html" style="text-decoration: none; position: relative; left: 3%;">
+            <img src="images/favicon.png" style="position: relative; top: 5px;">
+            <img src="images/LordBlog.png" style="position: relative; top: 9px;">
+        </a>
+    </div>
+
+
+    <!-- Text on top of tv -->
+
+    <div class="topSiteArea">
+        <!-- Main title -->
+
+        <h1 class="siteText" style="color: red; font-size: 2cm; position: relative;">Welcome to the utopia!
+        </h1>
+
+        <!-- Subtitle -->
+
+        <h2 class="siteText" style="color: red; font-size: 1cm;">Game by xX_lordGameMaster_Xx</h2>
+        <br>
+
+        <!-- Main text -->
+
+        <p class="siteText" style="color: white; font-size: 20px;">
+            hello, people from my blog!1!1!!! i was doin some reserch on how to make games based
+            <br>on html and js and i ended up making this one on my own. its like a utopian city
+            <br>that is kinda like an dictatorship. i call it welcome to the utopia (srr couldn't
+            <br>think of a beter title). i made it like if it was a dos game (if you didnt know dos
+            <br>means disk operating system). anyways have fun playin it!
+            <br><br>ps: game story below tv
+        </p>
+    </div>
+
+
+    <!-- Game area -->
+
+    <div class="gameArea" style="-webkit-user-select: none; -ms-user-select: none; user-select: none;">
+        <div class="tvArea">
+            <!-- Tv image -->
+
+            <img class="tvArea" src="images/tvdetubo_preta.png" id="gameTv">
+
+            <!-- Hidden message -->
+
+            <div class="tvArea inTv off" style="display: block;">
+                <h1 id="rotation_code" style="color: rgb(0, 7, 0);">
+                    ROTATION 9 YARVNRAX BDACX MJ YNBCN WNPAJ CAMBODIA CODIFY
+                </h1>
+            </div>
+
+            <!-- Menu screen -->
+
+            <div class="tvArea inTv menu" style="display: none;">
+                <!-- Game title -->
+
+                <h1 class="tvArea gameText menu">
+                    WELCOME TO THE UTOPIA!
+                </h1>
+
+                <!-- Play button -->
+
+                <button class="tvArea gameText btn menu" onmouseover="play('sounds/select.wav')"
+                    onclick="play('sounds/click.wav');roomChange(1);game_start();inGameRooms();">
+                    PLAY
+                </button><br>
+
+                <!-- Instructions button -->
+
+                <button class="tvArea gameText btn menu" onmouseover="play('sounds/select.wav')"
+                    onclick="play('sounds/click.wav');roomChange(2);">
+                    INSTRUCTIONS
+                </button><br>
+            </div>
+
+
+            <!-- Playroom screen -->
+
+            <div class="tvArea inTv playroom" style="display: none; margin: 0;" id="playroom">
+                <!-- Stats & Inventory -->
+
+                <div class="tvArea inGame playroom" style="clear: both;">
+                    <!-- Life stats -->
+
+                    <h1 class="tvArea inGame gameText playroom" style="float: left" id="health">LIFE: 100</h1>
+
+                    <!-- Inventory -->
+
+                    <button class="tvArea inGame gameText btn playroom" style="width: 30px;"
+                        onclick="play('sounds/click.wav'); change_item(-1);">&lt</button>
+                    <img class="tvArea inGame gameText playroom" src="images/inventory/big_sword.png" id="item_display">
+                    <button class="tvArea inGame gameText btn playroom" style="width: 30px;"
+                        onclick="play('sounds/click.wav'); change_item(1);">&gt</button>
+
+                    <!-- Attack stats -->
+
+                    <h1 class="tvArea inGame gameText playroom" style="float: right" id="attack">ATK: 100</h1>
+                </div>
+
+                <br>
+
+                <!-- Room description -->
+
+                <div style="margin: auto; border: dotted; border-color: white; width: 403px;">
+                    <h2 class="tvArea inGame gameText playroom"
+                        style="margin-left: auto; margin-right: auto; text-wrap: wrap;" id="description">This room
+                        is empty. There are passages to the west, north and east.<br>Which way will you go?</h2>
+                </div>
+
+                <!-- Actions -->
+
+                <div class="tvArea inGame playroom" id="actions">
+                    <!-- Movement -->
+
+                    <table class="tvArea inGame playroom" style="margin-left: auto; margin-right: auto;">
+                        <tr class="tvArea inGame playroom">
+
+                            <!-- West button -->
+
+                            <th class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn moveBtn playroom active" id="westBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/click.wav'); changeInGameRooms(0);">West</button>
+                            </th>
+
+                            <!-- North button-->
+
+                            <th class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn moveBtn playroom active" id="northBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/click.wav'); changeInGameRooms(1);">North</button>
+                            </th>
+
+                            <!-- South button -->
+
+                            <th class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn moveBtn playroom deactive" id="southBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/click.wav'); changeInGameRooms(2);">South</button>
+                            </th>
+
+                            <!-- East button -->
+
+                            <th class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn moveBtn playroom active" id="eastBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/click.wav'); changeInGameRooms(3);">East</button>
+                            </th>
+                        </tr>
+                    </table>
+
+                    <!-- Attack & Use -->
+
+                    <table class="tvArea inGame playroom" style="margin-left: auto; margin-right: auto;">
+                        <tr class="tvArea inGame playroom">
+                            <!-- Attack button -->
+
+                            <td class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn actionBtn playroom deactive" id="atkBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/attack.wav'); attack(player, enemy);">Attack</button>
+                            </td>
+
+                            <!-- Use button -->
+
+                            <td class="tvArea inGame playroom">
+                                <button class="tvArea inGame gameText btn actionBtn playroom deactive" id="useBtn"
+                                    onmouseover="play('sounds/select.wav')"
+                                    onclick="play('sounds/use.wav'); use_item();">Use</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Input -->
+
+                <div class="tvArea inGame playroom" id="safe_input">
+                    <input class="tvArea inGame playroom" type="text" maxlength="8" size="48" id="password_input" />
+                    <button class="tvArea inGame gameText btn actionBtn playroom"
+                        onmouseover="play('sounds/select.wav');"
+                        onclick="play('sounds/click.wav'); submit_password();">Submit</button>
+                </div>
+            </div>
+
+
+            <!-- Instructions screen -->
+
+            <div class="tvArea inTv instructions" style="display: none;">
+                <h1 class="tvArea gameText instructions">
+                    you use the movement buttons to move around the place (like east for example) and use the action
+                    buttons when you want to attack or use an item you have selected.
+                </h1>
+
+                <button class="tvArea gameText btn instructions" onmouseover="play('sounds/select.wav')"
+                    onclick="play('sounds/click.wav');roomChange(0)">
+                    GO BACK TO MENU
+                </button>
+            </div>
+
+            <div class="tvArea inTv gameOver" style="display: none;">
+                <h1 class="tvArea gameText gameOver">
+                    GAME OVER
+                </h1>
+
+                <button class="tvArea gameText btn gameOver" onmouseover="play('sounds/select.wav')"
+                    onclick="play('sounds/click.wav');roomChange(1);game_start();inGameRooms();">
+                    RESTART
+                </button>
+            </div>
+
+            <div class="tvArea inTv youWin" style="display: none;">
+                <h1 class="tvArea gameText youWin">
+                    YOU WIN!
+                </h1>
+
+                <h2 class="tvArea gameText youWin">you opened the safe and broke the orb, freeing everyone from the
+                    utopia! thanks for play me game :)</h2>
+
+                <button class="tvArea gameText btn youWin" onmouseover="play('sounds/select.wav')"
+                    onclick="play('sounds/click.wav');roomChange(1);game_start();inGameRooms();">
+                    RESTART
+                </button>
+            </div>
+        </div>
+
+        <!-- Power button -->
+
+        <button class="tvArea gameText btn power" onclick="powerButton();updateSubmitPassword();" style="position: static;">
+            POWER
+        </button>
+    </div>
+
+
+    <!-- Text on bottom of tv; Story text -->
+
+    <div class="bottomTextArea" style="position:relative;">
+        <!-- Story title -->
+
+        <h2 class="bottomTextArea siteText" style="color: red; font-size: 1cm;">Story</h2>
+
+        <!-- Story text -->
+
+        <p class="bottomTextArea siteText" style="color: white; font-size: 20px;">
+            ok so basically there is like this dictatorship and it's like a mistery game and
+            <br>you have to walk around the town and if they find you, youll have to batle
+            <br>them. and after you go to the place you need to go, you win. thats it. its
+            <br>very simple but i like it so cool :]
+        </p>
+    </div>
+
+
+    <!-- Site bottom -->
+
+    <footer>
+        <br>
+        <h3 class="siteText" style="color: white;">LordBlog</h3>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
