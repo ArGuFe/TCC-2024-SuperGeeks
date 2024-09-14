@@ -117,7 +117,7 @@ var item_selected = 0;
 // Player stats
 
 let player = {
-    life: 50,
+    life: 100,
     atk: 5
 }
 
@@ -179,7 +179,7 @@ function game_start() {
     document.getElementById("rotation_code").style="color: rgb(0,7,0);"
 
     cor_descs = [
-        [`You started your way to the Utopia's center. It is time to end the farse! You have got a Small sword with you.`,`What are you doing? Why are you going back you stupid idiot? Return and end the farse!`],
+        [`You started your way to the Utopia's center. It is time to end the farse! You have got a ${ITEMS_LIST[1].name} with you.`,`What are you doing? Why are you going back you stupid idiot? Return and end the farse!`],
         [`You enter inside a small room. Inside it was a small cut in half paper that was written: "${password.toString().slice(0,2)}". You pick it up.`,`You re-enter the small room. It's now empty.`],
         [`You enter inside a very dirty room. Inside it, you found a small cut in half paper that was written: "${password.toString().slice(2,4)}". You pick it up.`,`You re-enter the dirty room. It's now empty.`],
         [`You enter inside a room with an only box in the corner of it. You look inside it and find a button with a "${btn_missing}" stamped on it. You pick it up.`,`You re-enter the room where you found the button. It's now empty.`],
