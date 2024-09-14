@@ -1,5 +1,104 @@
 //#region -- Game functions --
 
+// Constants
+
+const ITEMS_LIST = [
+    {name: "Life potion", oneUse: true, effect: () => {player.life+=10;}, icon: "images/inventory/life_potion.png"},
+    {name: "Knife", oneUse: false, effect: () => {player.atk=5;}, icon: "images/inventory/knife.png"},
+    {name: "Small sword", oneUse: false, effect: () => {player.atk=10;}, icon: "images/inventory/small_sword.png"},
+    {name: "Big sword", oneUse: false, effect: () => {player.atk=15;}, icon: "images/inventory/big_sword.png"}
+];
+
+const PLAYER_HEALTH = document.getElementById("health"); // Get player health display
+const PLAYER_ATK = document.getElementById("attack"); // Get player attack display
+const ITEM_DISPLAY = document.getElementById("item_display"); // Get items display
+const ACTIONS = $("#actions"); // Get actions display
+const SAFE_INPUT = $("#safe_input"); // Get password input display
+
+
+const TV_STATES = [
+    "menu",
+    "playroom",
+    "instructions",
+    "gameOver",
+    "youWin"
+];
+
+const GAME_ROOMS = [
+    "start_room",
+    "hint_room_0",
+    "hint_room_1",
+    "button_room",
+    "deadpile_room",
+    "jeans_room",
+    "supply_room",
+    "password_room",
+    "corridor_0",
+    "corridor_1",
+    "corridor_2",
+    "corridor_3",
+    "corridor_4",
+    "corridor_5",
+    "corridor_6",
+    "corridor_7",
+    "corridor_8",
+    "corridor_9",
+    "corridor_10",
+    "corridor_11",
+    "corridor_12",
+    "corridor_13",
+    "center_room"
+];
+
+const ROOMS_PATHS = [
+    {west: false, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[0] --> east
+    {west: false, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[1] --> east
+    {west: false, north: true, south: false, east: false, atk: false, use: true},    // GAME_ROOMS[2] --> north
+    {west: false, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[3] --> east
+    {west: false, north: true, south: false, east: false, atk: false, use: true},    // GAME_ROOMS[4] --> north
+    {west: false, north: true, south: false, east: false, atk: false, use: true},    // GAME_ROOMS[5] --> north
+    {west: true, north: false, south: false, east: false, atk: false, use: true},    // GAME_ROOMS[6] --> west
+    {west: false, north: false, south: false, east: true, atk: false, use: true},     // GAME_ROOMS[7] --> east
+    {west: true, north: true, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[8] --> west, north, east
+    {west: true, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[9] --> west, east
+    {west: true, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[10] --> west, east
+    {west: true, north: true, south: false, east: false, atk: false, use: true},    // GAME_ROOMS[11] --> west, north
+    {west: true, north: false, south: true, east: false, atk: false, use: true},    // GAME_ROOMS[12] --> west, south
+    {west: true, north: true, south: true, east: false, atk: false, use: true},    // GAME_ROOMS[13] --> west, north, south
+    {west: false, north: true, south: true, east: true, atk: false, use: true},    // GAME_ROOMS[14] --> north, south, east
+    {west: true, north: false, south: true, east: false, atk: false, use: true},    // GAME_ROOMS[15] --> west, south
+    {west: true, north: true, south: true, east: true, atk: false, use: true},    // GAME_ROOMS[16] --> west, north, south, east
+    {west: true, north: false, south: false, east: true, atk: false, use: true},    // GAME_ROOMS[17] --> west, east
+    {west: false, north: true, south: true, east: false, atk: false, use: true},    // GAME_ROOMS[18] --> north, south
+    {west: false, north: false, south: true, east: true, atk: false, use: true},    // GAME_ROOMS[19] --> south, east
+    {west: true, north: false, south: true, east: true, atk: false, use: true},    // GAME_ROOMS[20] --> west, south, east
+    {west: true, north: false, south: true, east: false, atk: false, use: true},    // GAME_ROOMS[21] --> west, south
+];
+
+const room_transitions = [
+    [null, null, null, 8],  // GAME_ROOMS[0] --> east to GAME_ROOMS[8]
+    [null, null, null, 13], // GAME_ROOMS[1] --> east to GAME_ROOMS[13]
+    [null, 21, null, null], // GAME_ROOMS[2] --> north to GAME_ROOMS[21]
+    [null, null, null, 12], // GAME_ROOMS[3] --> east to GAME_ROOMS[12]
+    [null, 20, null, null], // GAME_ROOMS[4] --> north to GAME_ROOMS[20]
+    [null, 16, null, null], // GAME_ROOMS[5] --> north to GAME_ROOMS[16]
+    [17, null, null, null], // GAME_ROOMS[6] --> west to GAME_ROOMS[17]
+    [22, null, null, 15],   // GAME_ROOMS[7] --> west, east to GAME_ROOMS[15]
+    [0, 13, null, 9],       // GAME_ROOMS[8] --> west, north, east to GAME_ROOMS[0, 13, 9]
+    [8, null, null, 10],    // GAME_ROOMS[9] --> west, east to GAME_ROOMS[8, 10]
+    [9, null, null, 11],    // GAME_ROOMS[10] --> west, east to GAME_ROOMS[9, 11]
+    [10, 12, null, null],   // GAME_ROOMS[11] --> west, north to GAME_ROOMS[10, 12]
+    [3, null, 11, null],    // GAME_ROOMS[12] --> west, south to GAME_ROOMS[3, 11]
+    [1, 14, 8, null],       // GAME_ROOMS[13] --> west, north, south to GAME_ROOMS[1, 14, 8]
+    [null, 15, 13, 16],     // GAME_ROOMS[14] --> north, south, east to GAME_ROOMS[15, 13, 16]
+    [7, null, 14, null],    // GAME_ROOMS[15] --> west, south to GAME_ROOMS[7, 14]
+    [14, 18, 5, 17],        // GAME_ROOMS[16] --> west, north, south, east to GAME_ROOMS[14, 18, 5, 17]
+    [16, null, null, 6],    // GAME_ROOMS[17] --> west, east to GAME_ROOMS[16, 6]
+    [null, 19, 16, null],   // GAME_ROOMS[18] --> north, south to GAME_ROOMS[19, 16]
+    [null, null, 18, 20],   // GAME_ROOMS[19] --> south, east to GAME_ROOMS[18, 20]
+    [19, null, 4, 21],      // GAME_ROOMS[20] --> west, south, east to GAME_ROOMS[19, 4, 21]
+    [20, null, 2, null]     // GAME_ROOMS[21] --> west, south to GAME_ROOMS[20, 2]
+];
 
 // -- Play audio --
 
@@ -11,14 +110,7 @@ function play(audioLink) {
 
 // Inventory
 
-const items_list = [
-    {name: "Life potion", oneUse: true, effect: () => {player.life+=10;}, icon: "images/inventory/life_potion.png"},
-    {name: "Small sword", oneUse: false, effect: () => {player.atk=5;}, icon: "images/inventory/small_sword.png"},
-    {name: "Medium sword", oneUse: false, effect: () => {player.atk=10;}, icon: "images/inventory/medium_sword.png"},
-    {name: "Big sword", oneUse: false, effect: () => {player.atk=15;}, icon: "images/inventory/big_sword.png"}
-];
-
-var inventory = [items_list[1]];
+var inventory = [ITEMS_LIST[1]];
 var item_selected = 0;
 
 
@@ -32,15 +124,10 @@ let player = {
 
 // Player UI
 
-const player_health = document.getElementById("health"); // Get player health display
-const player_atk = document.getElementById("attack"); // Get player attack display
-const item_display = document.getElementById("item_display"); // Get items display
-const actions = $("#actions"); // Get actions display
-const safe_input = $("#safe_input"); // Get password input display
 
-player_health.innerHTML = `LIFE: ${player.life}`;
-player_atk.innerHTML = `ATK: ${player.atk}`;
-item_display.src = inventory[item_selected].icon;
+PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
+PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
+ITEM_DISPLAY.src = inventory[item_selected].icon;
 
 // Enemy stats
 
@@ -80,15 +167,15 @@ function game_start() {
 
     enemy.life=30;
 
-    inventory = [items_list[1]];
+    inventory = [ITEMS_LIST[1]];
     item_selected=0;
     password = Math.floor(Math.random()*(9999-1000)+1000);
     btn_missing = password.toString().slice((pass_num=Math.floor(Math.random()*3)),pass_num+1);
-    supply_room_item = items_list[Math.floor(Math.random()*(items_list.length))];
+    supply_room_item = ITEMS_LIST[Math.floor(Math.random()*(ITEMS_LIST.length))];
 
-    player_health.innerHTML = `LIFE: ${player.life}`;
-    player_atk.innerHTML = `ATK: ${player.atk}`;
-    item_display.src = inventory[item_selected].icon;
+    PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
+    PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
+    ITEM_DISPLAY.src = inventory[item_selected].icon;
     document.getElementById("rotation_code").style="color: rgb(0,7,0);"
 
     cor_descs = [
@@ -122,14 +209,14 @@ function game_start() {
 
     for (var i=0;i<cor_descs.length-9;i++) {
         const RNG = Math.floor(Math.random()*100);
-        const item_RNG = items_list[Math.floor(Math.random()*(items_list.length))];
+        const ITEM_RNG = ITEMS_LIST[Math.floor(Math.random()*(ITEMS_LIST.length))];
 
-        rooms_items[i+8]=item_RNG;
+        rooms_items[i+8]=ITEM_RNG;
 
         var description = `You enter a corridor.`;
 
         if (RNG>-1 && RNG<=30) {
-            description += ` You found a ${item_RNG.name} on the ground and picked it up.`;
+            description += ` You found a ${ITEM_RNG.name} on the ground and picked it up.`;
             
             rooms_events[i+8]=1;
             cor_descs[i+8][1] = `You enter a corridor. It's cleaned up now.`;
@@ -147,7 +234,7 @@ function game_start() {
             rooms_events[i+8]=2;
 
             if (RNG>80) {
-                description += ` He was also blocking a ${item_RNG.name} from you.`;
+                description += ` He was also blocking a ${ITEM_RNG.name} from you.`;
 
                 rooms_events[i+8]=3;
             }
@@ -164,17 +251,17 @@ game_start();
 // Attacking
 
 function attack() {
-    const p_critical_hit = Math.random() < 0.1;
-    const e_critical_hit = Math.random() < 0.1;
+    const P_CRITICAL_HIT = Math.random() < 0.1;
+    const E_CRITICAL_HIT = Math.random() < 0.1;
 
     let p_damage = player.atk;
     let e_damage = enemy.atk;
 
-    if (p_critical_hit) {
+    if (P_CRITICAL_HIT) {
         p_damage *= 2;
     }
 
-    if (e_critical_hit) {
+    if (E_CRITICAL_HIT) {
         e_damage *= 2;
     }
 
@@ -197,8 +284,8 @@ function use_item() {
         player.life=50;
     }
 
-    player_health.innerHTML = `LIFE: ${player.life}`;
-    player_atk.innerHTML = `ATK: ${player.atk}`;
+    PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
+    PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
 
     if (inventory[item_selected].oneUse==true){
         inventory.splice(item_selected,1);
@@ -217,16 +304,16 @@ function change_item(dir) {
         item_selected=inventory.length-1;
     }
 
-    item_display.src = inventory[item_selected].icon;
+    ITEM_DISPLAY.src = inventory[item_selected].icon;
 }
 
 
 // Submit safe password
 
 function submit_password() {
-    const password_input = document.getElementById("password_input");
+    const PASSWORD_INPUT = document.getElementById("password_input");
 
-    if (password_input.value.toLowerCase() == "omynapum") {
+    if (PASSWORD_INPUT.value.toLowerCase() == "omynapum") {
         win();
     }
 }
@@ -241,103 +328,21 @@ function submit_password() {
 
 // TV states
 
-var tvStates = [
-    "menu",
-    "playroom",
-    "instructions",
-    "gameOver",
-    "youWin"
-];
-
 var tvState = "menu";
 
 
 // In game rooms
 
-var game_rooms = [
-    "start_room",
-    "hint_room_0",
-    "hint_room_1",
-    "button_room",
-    "deadpile_room",
-    "jeans_room",
-    "supply_room",
-    "password_room",
-    "corridor_0",
-    "corridor_1",
-    "corridor_2",
-    "corridor_3",
-    "corridor_4",
-    "corridor_5",
-    "corridor_6",
-    "corridor_7",
-    "corridor_8",
-    "corridor_9",
-    "corridor_10",
-    "corridor_11",
-    "corridor_12",
-    "corridor_13",
-    "center_room"
-];
-
-var room = game_rooms[0];
+var room = GAME_ROOMS[0];
 
 
 // Rooms configurations
 
-var rooms_config = [
-    { desc: cor_descs[0][rooms_been[0]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[1][rooms_been[1]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[2][rooms_been[2]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-    { desc: cor_descs[3][rooms_been[3]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[4][rooms_been[4]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-    { desc: cor_descs[5][rooms_been[5]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-    { desc: cor_descs[6][rooms_been[6]], btnStates: { west: true, north: false, south: false, east: false, atk: false, use: true } },
-    { desc: cor_descs[7][rooms_been[7]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[8][rooms_been[8]], btnStates: { west: true, north: true, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[9][rooms_been[9]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[10][rooms_been[10]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[11][rooms_been[11]], btnStates: { west: true, north: true, south: false, east: false, atk: false, use: true } },
-    { desc: cor_descs[12][rooms_been[12]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } },
-    { desc: cor_descs[13][rooms_been[13]], btnStates: { west: true, north: true, south: true, east: false, atk: false, use: true } },
-    { desc: cor_descs[14][rooms_been[14]], btnStates: { west: false, north: true, south: true, east: true, atk: false, use: true } },
-    { desc: cor_descs[15][rooms_been[15]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } },
-    { desc: cor_descs[16][rooms_been[16]], btnStates: { west: true, north: true, south: true, east: true, atk: false, use: true } },
-    { desc: cor_descs[17][rooms_been[17]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-    { desc: cor_descs[18][rooms_been[18]], btnStates: { west: false, north: true, south: true, east: false, atk: false, use: true } },
-    { desc: cor_descs[19][rooms_been[19]], btnStates: { west: false, north: false, south: true, east: true, atk: false, use: true } },
-    { desc: cor_descs[20][rooms_been[20]], btnStates: { west: true, north: false, south: true, east: true, atk: false, use: true } },
-    { desc: cor_descs[21][rooms_been[21]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } }
-];
+const ROOMS_CONFIG = [];
 
-
-// Set transitions between rooms
-
-const room_transitions = [
-    [null, null, null, 8],    // game_rooms[0] --> east to game_rooms[8]
-    [null, null, null, 13],   // game_rooms[1] --> east to game_rooms[13]
-    [null, 21, null, null],   // game_rooms[2] --> north to game_rooms[21]
-    [null, null, null, 12],   // game_rooms[3] --> east to game_rooms[12]
-    [null, 20, null, null],   // game_rooms[4] --> north to game_rooms[20]
-    [null, 16, null, null],   // game_rooms[5] --> north to game_rooms[16]
-    [17, null, null, null],   // game_rooms[6] --> west to game_rooms[17]
-    [22, null, null, 15],   // game_rooms[7] --> east to game_rooms[15]
-    [0, 13, null, 9],         // game_rooms[8] --> west, north, east to game_rooms[0, 13, 9]
-    [8, null, null, 10],      // game_rooms[9] --> west, east to game_rooms[8, 10]
-    [9, null, null, 11],      // game_rooms[10] --> west, east to game_rooms[9, 11]
-    [10, 12, null, null],     // game_rooms[11] --> west, north to game_rooms[10, 12]
-    [3, null, 11, null],      // game_rooms[12] --> west, south to game_rooms[3, 11]
-    [1, 14, 8, null],         // game_rooms[13] --> west, north, south to game_rooms[1, 14, 8]
-    [null, 15, 13, 16],       // game_rooms[14] --> north, south, east to game_rooms[15, 13, 16]
-    [7, null, 14, null],      // game_rooms[15] --> west, south to game_rooms[7, 14]
-    [14, 18, 5, 17],          // game_rooms[16] --> west, north, south, east to game_rooms[14, 18, 5, 17]
-    [16, null, null, 6],      // game_rooms[17] --> west, east to game_rooms[16, 6]
-    [null, 19, 16, null],     // game_rooms[18] --> north, south to game_rooms[19, 16]
-    [null, null, 18, 20],     // game_rooms[19] --> south, east to game_rooms[18, 20]
-    [19, null, 4, 21],        // game_rooms[20] --> west, south, east to game_rooms[19, 4, 21]
-    [20, null, 2, null]       // game_rooms[21] --> west, south to game_rooms[20, 2]
-];
-
+for (var i=0; i<GAME_ROOMS.length; i++) {
+    ROOMS_CONFIG.push({ desc: cor_descs[i][rooms_been[i]], btnStates: ROOMS_PATHS[i] });
+}
 
 //#endregion
 
@@ -347,9 +352,9 @@ const room_transitions = [
 // Change TV state
 
 function roomChange(entering) {
-    $("." + tvStates[tvStates.indexOf(tvState)]).hide();
-    $("." + tvStates[entering]).show();
-    tvState = tvStates[entering];
+    $("." + TV_STATES[TV_STATES.indexOf(tvState)]).hide();
+    $("." + TV_STATES[entering]).show();
+    tvState = TV_STATES[entering];
 }
 
 // Turn TV off/on
@@ -392,8 +397,8 @@ function win() {
 // Update UI
 
 function update_fight_ui(player_damage, enemy_damage) {
-    player_health.innerHTML = `LIFE: ${player.life}`;
-    player_atk.innerHTML = `ATK: ${player.atk}`;
+    PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
+    PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
 
     var description = "";
     
@@ -406,14 +411,14 @@ function update_fight_ui(player_damage, enemy_damage) {
     } else {
         description = `You have dealt ${player_damage} damage on ${enemy.name}. The ${enemy.name} is dead now.`;
         
-        if (rooms_events[game_rooms.indexOf(room)]==3) {
-            inventory.push(rooms_items[game_rooms.indexOf(room)]);
+        if (rooms_events[GAME_ROOMS.indexOf(room)]==3) {
+            inventory.push(rooms_items[GAME_ROOMS.indexOf(room)]);
         }
         
-        rooms_events[game_rooms.indexOf(room)]=0;
+        rooms_events[GAME_ROOMS.indexOf(room)]=0;
     }
 
-    setRoomState(description,rooms_config[game_rooms.indexOf(room)].btnStates);
+    setRoomState(description,ROOMS_CONFIG[GAME_ROOMS.indexOf(room)].btnStates);
 }
 
 
@@ -430,7 +435,7 @@ function updateButtonState(btn, is_active) {
 }
 
 function updateSubmitPassword() {
-    if (room=="center_room") { actions.hide(); safe_input.show(); } else { actions.show(); safe_input.hide(); }
+    if (room=="center_room") { ACTIONS.hide(); SAFE_INPUT.show(); } else { ACTIONS.show(); SAFE_INPUT.hide(); }
 }
 
 
@@ -451,7 +456,7 @@ function setRoomState(desc, btnStates) {
 
     const attacked_button_states = setButtonBeingAttacked();
 
-    if (rooms_events[game_rooms.indexOf(room)]>1){
+    if (rooms_events[GAME_ROOMS.indexOf(room)]>1){
         for (const [btn, is_active] of Object.entries(attacked_button_states)) {
             updateButtonState(buttons[btn], is_active);
 
@@ -462,14 +467,16 @@ function setRoomState(desc, btnStates) {
             }
         }
     } else {
-        for (const [btn, is_active] of Object.entries(btnStates)) {
-            updateButtonState(buttons[btn], is_active);
-        }
+        if (room!="center_room"){
+            for (const [btn, is_active] of Object.entries(btnStates)) {
+                updateButtonState(buttons[btn], is_active);
+            }
 
-        if (room=="password_room" && rooms_been[game_rooms.indexOf(room)]==3) { updateButtonState(buttons.west, true); }
-        
-        updateSubmitPassword();
+            if (room=="password_room" && rooms_been[GAME_ROOMS.indexOf(room)]==3) { updateButtonState(buttons.west, true); }
+        }
     }
+
+    updateSubmitPassword();
 }
 
 
@@ -489,38 +496,18 @@ function setButtonBeingAttacked() {
 // Create game rooms
 
 function inGameRooms() {
-    const room_index = game_rooms.indexOf(room);
+    const room_index = GAME_ROOMS.indexOf(room);
 
     // Reset room configurations
 
-    rooms_config = [
-        { desc: cor_descs[0][rooms_been[0]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[1][rooms_been[1]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true }},
-        { desc: cor_descs[2][rooms_been[2]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-        { desc: cor_descs[3][rooms_been[3]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[4][rooms_been[4]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-        { desc: cor_descs[5][rooms_been[5]], btnStates: { west: false, north: true, south: false, east: false, atk: false, use: true } },
-        { desc: cor_descs[6][rooms_been[6]], btnStates: { west: true, north: false, south: false, east: false, atk: false, use: true } },
-        { desc: cor_descs[7][rooms_been[7]], btnStates: { west: false, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[8][rooms_been[8]], btnStates: { west: true, north: true, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[9][rooms_been[9]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[10][rooms_been[10]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[11][rooms_been[11]], btnStates: { west: true, north: true, south: false, east: false, atk: false, use: true } },
-        { desc: cor_descs[12][rooms_been[12]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } },
-        { desc: cor_descs[13][rooms_been[13]], btnStates: { west: true, north: true, south: true, east: false, atk: false, use: true } },
-        { desc: cor_descs[14][rooms_been[14]], btnStates: { west: false, north: true, south: true, east: true, atk: false, use: true } },
-        { desc: cor_descs[15][rooms_been[15]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } },
-        { desc: cor_descs[16][rooms_been[16]], btnStates: { west: true, north: true, south: true, east: true, atk: false, use: true } },
-        { desc: cor_descs[17][rooms_been[17]], btnStates: { west: true, north: false, south: false, east: true, atk: false, use: true } },
-        { desc: cor_descs[18][rooms_been[18]], btnStates: { west: false, north: true, south: true, east: false, atk: false, use: true } },
-        { desc: cor_descs[19][rooms_been[19]], btnStates: { west: false, north: false, south: true, east: true, atk: false, use: true } },
-        { desc: cor_descs[20][rooms_been[20]], btnStates: { west: true, north: false, south: true, east: true, atk: false, use: true } },
-        { desc: cor_descs[21][rooms_been[21]], btnStates: { west: true, north: false, south: true, east: false, atk: false, use: true } },
-        { desc: cor_descs[22][rooms_been[22]], btnStates: { west: false, north: false, south: false, east: false, atk: false, use: false } }
-    ];
+    ROOMS_CONFIG.length = 0;
+
+    for (var i=0; i<GAME_ROOMS.length; i++) {
+        ROOMS_CONFIG.push({desc: cor_descs[i][rooms_been[i]], btnStates: ROOMS_PATHS[i]});
+    }
 
     if (room_index != -1) {
-        const { desc, btnStates } = rooms_config[room_index];
+        const { desc, btnStates } = ROOMS_CONFIG[room_index];
         setRoomState(desc, btnStates);
     } else {
         console.log("ERR: Drawing rooms");
@@ -531,24 +518,24 @@ function inGameRooms() {
 // Change in game rooms
 
 function changeInGameRooms(dir) {
-    const next_room = room_transitions[game_rooms.indexOf(room)][dir];
+    const next_room = room_transitions[GAME_ROOMS.indexOf(room)][dir];
 
     if (next_room !== null) {
         if (room=="hint_room_0" || room=="hint_room_1") {
-            if (rooms_been[game_rooms.indexOf(room)]==0) {
+            if (rooms_been[GAME_ROOMS.indexOf(room)]==0) {
                 password_knowledge+=1;
             }
         }
 
-        if (room=="button_room" && rooms_been[game_rooms.indexOf("password_room")]<2) { rooms_been[game_rooms.indexOf("password_room")]=2; }
+        if (room=="button_room" && rooms_been[GAME_ROOMS.indexOf("password_room")]<2) { rooms_been[GAME_ROOMS.indexOf("password_room")]=2; }
 
-        if (rooms_been[game_rooms.indexOf(room)]<1) { rooms_been[game_rooms.indexOf(room)]=1; }
+        if (rooms_been[GAME_ROOMS.indexOf(room)]<1) { rooms_been[GAME_ROOMS.indexOf(room)]=1; }
 
-        if (password_knowledge==2 && rooms_been[game_rooms.indexOf("password_room")]==2) { rooms_been[game_rooms.indexOf("password_room")]=3; }
+        if (password_knowledge==2 && rooms_been[GAME_ROOMS.indexOf("password_room")]==2) { rooms_been[GAME_ROOMS.indexOf("password_room")]=3; }
 
-        room = game_rooms[next_room];
+        room = GAME_ROOMS[next_room];
 
-        if (rooms_events[game_rooms.indexOf(room)]==1) { inventory.push(rooms_items[game_rooms.indexOf(room)]); }
+        if (rooms_events[GAME_ROOMS.indexOf(room)]==1) { inventory.push(rooms_items[GAME_ROOMS.indexOf(room)]); }
 
         if (room=="supply_room") { inventory.push(supply_room_item); }
 
