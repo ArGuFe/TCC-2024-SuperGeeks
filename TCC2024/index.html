@@ -10,48 +10,45 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
-<body style="background-color: #000000;">
-
-    <div class="topMenu">
-
-        <a href="index.html" style="text-decoration: none; position: relative; left: 3%;">
-            <img src="images/favicon.png" style="position: relative; top: 5px;">
-            <img src="images/LordBlog.png" style="position: relative; top: 9px;">
+<body>
+    <div class="topMenuBar">
+        <a href="index.html">
+            <img src="images/favicon.png">
+            <img src="images/LordBlog.png">
         </a>
-
     </div>
 
-    <div class="posts" style="position: relative; width: 356px; left: 100px; text-align: left;">
-        <h1 class="posts siteText" style="color: white; text-align: left;">POSTS:</h1>
+    <section class="posts">
+        <h1 class="subtitle">POSTS:</h1>
 
-        <div class="posts" id="utopiaPost">
-            <a class="posts" href="gamepost.html" id="inUtopiaPost">
-                <div class="posts">
-                    <h2 class="posts siteText">Welcome to the utopia!</h2>
-                    <img class="posts" src="images/utopia.png">
+        <article class="post">
+            <a href="gamepost.html" class="post-link">
+                <div>
+                    <h2 class="post-title">Welcome to the utopia!</h2>
+                    <img class="post-image" src="images/utopia.png" alt="Utopia banner">
                 </div>
             </a>
-        </div>
+        </article>
 
         <br>
         <hr><br>
 
-        <div class="posts" id="welcomePost">
-            <a class="posts" href="welcome.html" id="inWelcomePost">
-                <div class="posts">
-                    <h2 class="posts siteText">Welcome to my blog!!1!</h2>
-                    <img class="posts" src="images/welcome.png">
+        <article class="post">
+            <a href="welcome.html" class="post-link">
+                <div>
+                    <h2 class="post-title">Welcome to my blog!!1!</h2>
+                    <img class="post-image" src="images/welcome.png" alt="Welcome to blog banner">
                 </div>
             </a>
-        </div>
-        
-        <h1 class="posts" style="color: white;">this blog is stil undr contruction v:</h1>
-    </div>
-</body>
+        </article>
 
-<footer>
+        <h1 style="color: white;">this blog is still undr construction v:</h1>
+    </section>
+
     <br>
-    <h3 class="siteText" style="color: white;">LordBlog</h3>
-</footer>
+    <footer>
+        <h3 class="siteText">LordBlog</h3>
+    </footer>
+</body>
 
 </html>
