@@ -92,7 +92,7 @@ body {
 
 .inTv {
     position: absolute;
-    left: 12.1cm;
+    margin-left: 29vw;
     bottom: -8.5cm;
     width: 16cm;
     height: 12.5cm;
@@ -185,6 +185,14 @@ body {
     margin: 50px;
 }
 
+.visible {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
 /* Room descripition */
 #roomDesc {
     display: flex;
@@ -199,7 +207,7 @@ body {
 
 
 #description * {
-    text-wrap: wrap;
+    text-wrap: pretty;
     text-align: center;
     flex: 0 0 403px;
 }

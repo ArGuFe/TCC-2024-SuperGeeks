@@ -83,6 +83,7 @@ const PLAYER_ATK = document.getElementById("attack"); // Get player ATK display
 const ITEM_DISPLAY = document.getElementById("item_display"); // Get items display
 const ACTIONS = $("#actions"); // Get actions display
 const SAFE_INPUT = $("#safe_input"); // Get password input display
+const ROT_CODE = document.getElementById("rotation_code") // Get rotation code
 
 //#endregion
 
@@ -99,7 +100,8 @@ function gameStart() {
     PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
     PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
     ITEM_DISPLAY.src = inventory[slot_selected]?.icon || "images/inventory/backpack.png";
-    document.getElementById("rotation_code").style.display = "none";
+    ROT_CODE.classList.remove("visible");
+    ROT_CODE.classList.add("hidden");
 
     const supply_item = ITEMS_LIST[Math.floor(Math.random() * (ITEMS_LIST.length))];
 
@@ -372,7 +374,8 @@ function changeInGameRooms(dir) {
 
     // Makes rotation code visible if on "center_room"
     if (next_room_config.name === "center_room") {
-        document.getElementById("rotation_code").style.display = "block";
+        ROT_CODE.classList.remove("hidden");
+        ROT_CODE.classList.add("visible");
     }
 
     setRoomState(next_room_config.desc[Math.min(next_room_config.desc.length - 1, next_room_config.been)]);

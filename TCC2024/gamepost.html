@@ -38,13 +38,13 @@
         <img src="images/tvdetubo_preta.png" id="gameTv">
         <div class="gameArea">
             <div class="inTv">
-                <div class="off" style="display: block;">
-                    <h1 class="gameText" style="display: none;" id="rotation_code">
+                <div class="off hidden" id="rotation_code">
+                    <h1 class="gameText">
                         ROTATION 9 YARVNRAX BDACX MJ YNBCN WNPAJ CAMBODIA CODIFY
                     </h1>
                 </div>
 
-                <div class="menu" style="display: none;">
+                <div class="menu hidden">
                     <h1 style="color: white; margin: 75px;">WELCOME TO THE UTOPIA!</h1>
                     <button class="gameText btn menuBtn" onmouseover="playAudio('sounds/select.wav')"
                         onclick="stateChange('playroom'); inGameRooms();">
@@ -58,8 +58,7 @@
 
 
                 <!-- Playroom screen -->
-
-                <div class="playroom" style="display: none;">
+                <div class="playroom hidden">
                     <!-- Stats & Inventory -->
                     <div class="inGame" id="stats">
                         <!-- Life stats -->
@@ -149,7 +148,7 @@
                 </div>
 
                 <!-- Instructions screen -->
-                <div class="instructions" style="display: none;">
+                <div class="instructions hidden">
                     <h1 class="gameText">
                         you use the movement buttons to move around the place (like east for example) and use the action
                         buttons when you want to attack or use an item you have selected.
@@ -161,7 +160,7 @@
                     </button>
                 </div>
 
-                <div class="gameOver" style="display: none;">
+                <div class="gameOver hidden">
                     <h1 class="gameText gameOver">
                         GAME OVER
                     </h1>
@@ -172,7 +171,7 @@
                     </button>
                 </div>
 
-                <div class="youWin" style="display: none;">
+                <div class="youWin hidden">
                     <h1 class="gameText">YOU WIN!</h1>
                     <h2 class="gameText">you opened the safe and broke the orb, freeing everyone from the
                         utopia! thanks for play me game :]</h2>
@@ -195,7 +194,7 @@
 
     <div class="bottomTextArea">
         <h2 class="subtitle">Story</h2>
-        <p class="site-text">
+        <p class="siteText">
             ok so basically there is like this dictatorship and it's like a mistery game and
             <br>you have to walk around the town and if they find you, youll have to batle
             <br>them. and after you go to the place you need to go, you win. thats it. its
@@ -210,7 +209,7 @@
 
     <br>
     <footer>
-        <h3 class="site-text">LordBlog</h3>
+        <h3 class="siteText">LordBlog</h3>
     </footer>
 </body>
 
