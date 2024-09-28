@@ -38,8 +38,8 @@
         <img src="images/tvdetubo_preta.png" id="gameTv">
         <div class="gameArea">
             <div class="inTv">
-                <div class="off hidden" id="rotation_code">
-                    <h1 class="gameText">
+                <div class="off hidden">
+                    <h1 class="gameText" id="rotation_code">
                         ROTATION 9 YARVNRAX BDACX MJ YNBCN WNPAJ CAMBODIA CODIFY
                     </h1>
                 </div>
@@ -136,15 +136,14 @@
                                 </td>
                             </tr>
                         </table>
-                    </div>
 
-                    <!-- Input -->
-                    <div class="inGame" id="safe_input">
-                        <input type="text" maxlength="8" size="48" id="password_input"/>
-                        <button class="gameText btn actionBtn"
-                            onmouseover="playAudio('sounds/select.wav');" onclick="submit_password();">Submit</button>
+                        <!-- Input -->
+                        <div id="safe_input">
+                            <input type="text" maxlength="8" size="48" id="password_input"/>
+                            <button class="gameText btn actionBtn"
+                                onmouseover="playAudio('sounds/select.wav');" onclick="submit_password();">Submit</button>
+                        </div>
                     </div>
-
                 </div>
 
                 <!-- Instructions screen -->

@@ -1,5 +1,27 @@
 //#region -- Classes --
 
+class Room {
+    constructor(name, desc, btn_states, enemy, item, state) {
+        this.name = name;
+        this.desc = desc;
+        this.btn_states = btn_states;
+        this.enemy = enemy;
+        this.item = item;
+        this.state = state;
+    }
+}
+
+class BtnStates {
+    constructor(west, north, south, east, atk, use) {
+        this.west = west;
+        this.north = north;
+        this.south = south;
+        this.east = east;
+        this.atk = atk;
+        this.use = use;
+    }
+}
+
 class Item {
     constructor(name, one_use, effect, icon) {
         this.name = name;
@@ -9,18 +31,11 @@ class Item {
     }
 }
 
-class Player {
-    constructor(life, max_life, atk) {
-        this.life = life;
-        this.max_life = max_life;
-        this.atk = atk;
-    }
-}
-
-class Enemy {
-    constructor(name, life, atk) {
+class Entity {
+    constructor(name, life, max_life, atk) {
         this.name = name;
         this.life = life;
+        this.max_life = max_life;
         this.atk = atk;
     }
 }
@@ -37,10 +52,10 @@ const ITEMS_LIST = [
 ];
 
 const ENEMIES_LIST = [
-    { name: "Skeleton", life: 15, atk: 2 },
-    { name: "Giant Beetle", life: 20, atk: 3 },
-    { name: "Soldier", life: 30, atk: 5 },
-    { name: "Golem", life: 50, atk: 7 },
+    { name: "Skeleton", life: 15, max_life: 15, atk: 2 },
+    { name: "Giant Beetle", life: 20, max_life: 20, atk: 3 },
+    { name: "Soldier", life: 30, max_life: 30, atk: 5 },
+    { name: "Golem", life: 50, max_life: 50, atk: 7 },
 ]
 
 const ROOMS_TRANSITIONS = [
@@ -83,7 +98,7 @@ const PLAYER_ATK = document.getElementById("attack"); // Get player ATK display
 const ITEM_DISPLAY = document.getElementById("item_display"); // Get items display
 const ACTIONS = $("#actions"); // Get actions display
 const SAFE_INPUT = $("#safe_input"); // Get password input display
-const ROT_CODE = document.getElementById("rotation_code") // Get rotation code
+const ROT_CODE = $("#rotation_code") // Get rotation code
 
 //#endregion
 
@@ -92,7 +107,7 @@ const ROT_CODE = document.getElementById("rotation_code") // Get rotation code
 let ROOMS;
 
 function gameStart() {
-    player = new Player(100, 100, 5);
+    player = new Entity("Player", 100, 100, 5);
     room_index = 0;
     inventory = [ITEMS_LIST[1]];
     slot_selected = 0;
@@ -100,36 +115,35 @@ function gameStart() {
     PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
     PLAYER_ATK.innerHTML = `ATK: ${player.atk}`;
     ITEM_DISPLAY.src = inventory[slot_selected]?.icon || "images/inventory/backpack.png";
-    ROT_CODE.classList.remove("visible");
-    ROT_CODE.classList.add("hidden");
+    ROT_CODE.toggle(false);
 
     const supply_item = ITEMS_LIST[Math.floor(Math.random() * (ITEMS_LIST.length))];
 
     ROOMS = [
-        { name: "start_room", desc: [`You started your way to the Utopia's center. It is time to end the farse! You have got a ${ITEMS_LIST[1].name} with you.`, `What are you doing? Why are you going back you stupid idiot? Return and end the farse!`], btn_states: { west: false, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "hint_room_0", desc: [`You enter inside a small room. Inside it was a small cut in half paper that was written: "74". You pick it up.`, `You enter the small room. It's now empty.`], btn_states: { west: false, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "hint_room_1", desc: [`You enter inside a very dirty room. Inside it, you found a small cut in half paper that was written: "92". You pick it up.`, `You enter the dirty room. It's now empty.`], btn_states: { west: false, north: true, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "button_room", desc: [`You enter inside a room with an only box in the corner of it. You look inside it and find a button with a "3" stamped on it. You pick it up.`, `You enter the room where you found the button. It's now empty.`], btn_states: { west: false, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "dead_pile", desc: [`You enter inside nasty looking room. A dead body pile is in your view and it makes you sick to think the leader killed all those people and used this room to dump them. Poor people...`, `You the dead body pile room. It still makes you sick.`], btn_states: { west: false, north: true, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "jeans_room", desc: [`You enter inside another room. You see a shocking scene: A man wearing only a blue jeans commited suicide with a gun, with a letter by his side which said: "remember calça jeans". You don't know what that means, but you pick it up anyways.`, `You enter the suicidal man's room. It still looks the same.`], btn_states: { west: false, north: true, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "supply_room", desc: [`You enter inside a quite messy room. There were a lot of crates in it. On one of them, you find a ${supply_item.name}`, `You enter the supply room. There is nothing useful for you anymore.`], btn_states: { west: true, north: false, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "password_room", desc: [`You enter inside a room with a big door and a password pad with 4 digits. The button 3 is missing.`, `You enter the password pad room. The button 3 is still missing.`, `You enter the password pad room. You have put the missing button on the spot it belongs, but you don't know the code.`, `You enter the password pad room and enter the code in. The door has been opened.`], btn_states: { west: true, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_0", desc: [``], btn_states: { west: true, north: true, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_1", desc: [``], btn_states: { west: true, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_2", desc: [``], btn_states: { west: true, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_3", desc: [``], btn_states: { west: true, north: true, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_4", desc: [``], btn_states: { west: true, north: false, south: true, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_5", desc: [``], btn_states: { west: true, north: true, south: true, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_6", desc: [``], btn_states: { west: false, north: true, south: true, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_7", desc: [``], btn_states: { west: true, north: false, south: true, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_8", desc: [``], btn_states: { west: true, north: true, south: true, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_9", desc: [``], btn_states: { west: true, north: false, south: false, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_10", desc: [``], btn_states: { west: false, north: true, south: true, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_11", desc: [``], btn_states: { west: false, north: false, south: true, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_12", desc: [``], btn_states: { west: true, north: false, south: true, east: true, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "corridor_13", desc: [``], btn_states: { west: true, north: false, south: true, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 },
-        { name: "center_room", desc: [`The leader ran away, but left his room as it was. There was a safe on his table that was labled "City Mind Control Orb". There was a note sticking out of the safe, which was written "Hint: OFF."`], btn_states: { west: false, north: false, south: false, east: false, atk: false, use: true }, enemy: null, item: null, been: 0 }
-    ]
+        new Room("start_room", [`You started your way to the Utopia's center. It is time to end the farse! You have got a ${ITEMS_LIST[1].name} with you.`, `What are you doing? Why are you going back you stupid idiot? Return and end the farse!`], new BtnStates(false, false, false, true, false, true), null, null, 0),
+        new Room("hint_room_0", [`You enter inside a small room. Inside it was a small cut in half paper that was written: "74". You pick it up.`, `You enter the small room. It's now empty.`], new BtnStates(false, false, false, true, false, true), null, null, 0),
+        new Room("hint_room_1", [`You enter inside a very dirty room. Inside it, you found a small cut in half paper that was written: "92". You pick it up.`, `You enter the dirty room. It's now empty.`], new BtnStates(false, true, false, false, false, true), null, null, 0),
+        new Room("button_room", [`You enter inside a room with an only box in the corner of it. You look inside it and find a button with a "3" stamped on it. You pick it up.`, `You enter the room where you found the button. It's now empty.`], new BtnStates(false, false, false, true, false, true), null, null, 0),
+        new Room("dead_pile", [`You enter inside nasty looking room. A dead body pile is in your view and it makes you sick to think the leader killed all those people and used this room to dump them. Poor people...`, `You the dead body pile room. It still makes you sick.`], new BtnStates(false, true, false, false, false, true), null, null, 0),
+        new Room("jeans_room", [`You enter inside another room. You see a shocking scene: A man wearing only a blue jeans commited suicide with a gun, with a letter by his side which said: "remember calça jeans". You don't know what that means, but you pick it up anyways.`, `You enter the suicidal man's room. It still looks the same.`], new BtnStates(false, true, false, false, false, true), null, null, 0),
+        new Room("supply_room", [`You enter inside a quite messy room. There were a lot of crates in it. On one of them, you find a ${supply_item.name}`, `You enter the supply room. There is nothing useful here for you anymore.`], new BtnStates(true, false, false, false, false, true), null, null, 0),
+        new Room("password_room", [`You enter inside a room with a big door and a password pad with 4 digits. The button 3 is missing.`, `You enter the password pad room. The button 3 is still missing.`, `You enter the password pad room. You have put the missing button on the spot it belongs, but you don't know the code.`, `You enter the password pad room and enter the code in. The door has been opened.`], new BtnStates(false, false, false, true, false, true), null, null, 0),
+        new Room("corridor_0", [``], new BtnStates(true, true, false, true, false, true), null, null, 0),
+        new Room("corridor_1", [``], new BtnStates(true, false, false, true, false, true), null, null, 0),
+        new Room("corridor_2", [``], new BtnStates(true, false, false, true, false, true), null, null, 0),
+        new Room("corridor_3", [``], new BtnStates(true, true, false, false, false, true), null, null, 0),
+        new Room("corridor_4", [``], new BtnStates(true, false, true, false, false, true), null, null, 0),
+        new Room("corridor_5", [``], new BtnStates(true, true, true, false, false, true), null, null, 0),
+        new Room("corridor_6", [``], new BtnStates(false, true, true, true, false, true), null, null, 0),
+        new Room("corridor_7", [``], new BtnStates(true, false, true, false, false, true), null, null, 0),
+        new Room("corridor_8", [``], new BtnStates(true, true, true, true, false, true), null, null, 0),
+        new Room("corridor_9", [``], new BtnStates(true, false, false, true, false, true), null, null, 0),
+        new Room("corridor_10", [``], new BtnStates(false, true, true, false, false, true), null, null, 0),
+        new Room("corridor_11", [``], new BtnStates(false, false, true, true, false, true), null, null, 0),
+        new Room("corridor_12", [``], new BtnStates(true, false, true, true, false, true), null, null, 0),
+        new Room("corridor_13", [``], new BtnStates(true, false, true, false, false, true), null, null, 0),
+        new Room("center_room", [`The leader ran away, but left his room as it was. There was a safe on his table that was labled "City Mind Control Orb". There was a note sticking out of the safe, which was written "Hint: OFF."`], new BtnStates(false, false, false, false, false, true), null, null, 0)
+    ];
 
     ROOMS[6].item = new Item(supply_item.name, supply_item.one_use, supply_item.effect, supply_item.icon);
 
@@ -152,7 +166,7 @@ function gameStart() {
 
         if (RNG > 60) {
             description += ` There was a ${ENEMY_RNG.name} blocking the path.`;
-            room.enemy = new Enemy(ENEMY_RNG.name, ENEMY_RNG.life, ENEMY_RNG.atk);
+            room.enemy = new Entity(ENEMY_RNG.name, ENEMY_RNG.life, ENEMY_RNG.max_life, ENEMY_RNG.atk);
 
             if (RNG > 80) {
                 description += ` They were also blocking a ${ITEM_RNG.name} from you.`;
@@ -192,9 +206,8 @@ function attack() {
     let p_damage = player.atk * (P_HIT_RANDOM > 0.9 ? 2 : (P_HIT_RANDOM < 0.1 ? 0 : 1));
     let e_damage = enemy.atk * (E_HIT_RANDOM > 0.9 ? 2 : (E_HIT_RANDOM < 0.1 ? 0 : 1));
 
-    enemy.life = Math.max(0, enemy.life - p_damage);
-    player.life = Math.max(0, player.life - (enemy.life > 0 ? e_damage : 0));
-
+    enemy.life -= p_damage;
+    player.life -= enemy.life > 0 ? e_damage : 0;
 
     // Update UI
     PLAYER_HEALTH.innerHTML = `LIFE: ${player.life}`;
@@ -311,7 +324,7 @@ function setRoomState(desc) {
         updateButtonState(document.getElementById(`${btn}Btn`), is_active);
     });
 
-    if (!room.enemy && room.name === "password_room" && room.been === 3) {
+    if (!room.enemy && room.name === "password_room" && room.state === 3) {
         updateButtonState(document.getElementById(`westBtn`), true);
     }
 
@@ -326,7 +339,7 @@ function setRoomState(desc) {
 function inGameRooms() {
     gameStart();
     const room = ROOMS[room_index];
-    setRoomState(room.desc[Math.min(room.desc.length - 1, room.been)]);
+    setRoomState(room.desc[Math.min(room.desc.length - 1, room.state)]);
 }
 
 function changeInGameRooms(dir) {
@@ -343,24 +356,24 @@ function changeInGameRooms(dir) {
 
     // Update password knowledge
     if (current_room.name === "hint_room_0" || current_room.name === "hint_room_1") {
-        if (current_room.been === 0) {
+        if (current_room.state === 0) {
             password_knowledge++;
         }
     }
 
     // Update password room status
-    if (current_room.name === "button_room" && ROOMS[7].been < 2) {
-        ROOMS[7].been = 2;
+    if (current_room.name === "button_room" && ROOMS[7].state < 2) {
+        ROOMS[7].state = 2;
     }
 
     // Marks current room as visited
-    if (current_room.been < 1) {
-        current_room.been = 1;
+    if (current_room.state < 1) {
+        current_room.state = 1;
     }
 
     // Update password room status if knowledge is enough
-    if (password_knowledge === 2 && ROOMS[7].been === 2) {
-        ROOMS[7].been = 3;
+    if (password_knowledge === 2 && ROOMS[7].state === 2) {
+        ROOMS[7].state = 3;
     }
 
     // Update room index
@@ -374,11 +387,10 @@ function changeInGameRooms(dir) {
 
     // Makes rotation code visible if on "center_room"
     if (next_room_config.name === "center_room") {
-        ROT_CODE.classList.remove("hidden");
-        ROT_CODE.classList.add("visible");
+        ROT_CODE.toggle(true);
     }
 
-    setRoomState(next_room_config.desc[Math.min(next_room_config.desc.length - 1, next_room_config.been)]);
+    setRoomState(next_room_config.desc[Math.min(next_room_config.desc.length - 1, next_room_config.state)]);
 }
 
 //#endregion
